@@ -1,205 +1,193 @@
 <template>
-  <div :class="{ 'closed-menu': isMenuClosed }">
-    <nav class="vertical-menu-wrapper">
-      <!-- Logo y botón para abrir/cerrar menú -->
-      <div class="vertical-menu-logo">
-        <Logo />
-        <span class="open-menu-btn" @click="toggleMenu">
-          <hr /><hr /><hr />
-        </span>
-      </div>
-      <!-- Menú de navegación -->
-      <ul class="vertical-menu">
-        <li><router-link to="/home">Home</router-link></li>
-        <li><Link href="contact">Contact</Link></li>
-      </ul>
-    </nav>
+  <div :class="['sidebar', { 'is-closed': isMenuClosed }]">
+    <!-- Sidebar Header -->
+    <div class="sidebar-header">
+      <!-- Toggler Button usando FontAwesome -->
+      <button @click="toggleMenu" class="menu-toggle-btn">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
 
-    <!-- Contenido principal -->
-    <div class="content-wrapper">
-      <div class="content">
-        <router-view></router-view>
-      </div>
+    <!-- Menu Items -->
+    <ul class="sidebar-menu">
+      <li v-for="item in filteredMenuItems" :key="item.name" class="menu-item">
+        <router-link :to="item.path" class="menu-link">
+          <!-- Icono de menú -->
+          <i :class="item.icon" class="menu-icon"></i>
+          <!-- Texto del menú, solo visible cuando el sidebar está abierto -->
+          <span v-if="!isMenuClosed" class="menu-text">{{ item.name }}</span>
+        </router-link>
+      </li>
+    </ul>
+
+    <!-- Logout Button, solo visible cuando el sidebar está abierto -->
+    <div v-if="!isMenuClosed" class="logout">
+      <button @click="logout" class="logout-btn">Logout</button>
     </div>
   </div>
 </template>
 
 <script>
-// Importa el componente de logo si lo separas en un archivo distinto
-//import Logo from './Logo.vue'; 
-
-import {Link} from "@inertiajs/inertia-vue3";
-
 export default {
-  components: {
-    //Logo
-    Link
-  },
   data() {
     return {
-      isMenuClosed: false,
+      isMenuClosed: false, // Estado de apertura/cierre del sidebar
+      searchQuery: '',
+      menuItems: [
+        { name: 'Home', path: '/home', icon: 'fas fa-home' },
+        { name: 'Contact', path: '/contact', icon: 'fas fa-envelope' },
+        { name: 'About', path: '/about', icon: 'fas fa-info-circle' },
+        { name: 'Settings', path: '/settings', icon: 'fas fa-cog' },
+      ],
     };
+  },
+  computed: {
+    filteredMenuItems() {
+      return this.menuItems.filter(item =>
+        item.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    },
   },
   methods: {
     toggleMenu() {
-      this.isMenuClosed = !this.isMenuClosed;
+      this.isMenuClosed = !this.isMenuClosed; // Cambia el estado del sidebar
+    },
+    logout() {
+      console.log('Logout');
     },
   },
 };
 </script>
 
 <style scoped>
-body {
-  margin: 0;
-  background: #f4f5f7;
-  font-family: 'Arial', sans-serif;
+/* Variables de diseño (paleta profesional) */
+:root {
+  --sidebar-bg: #2f3b48; /* Azul oscuro */
+  --sidebar-color: #e4e7ea; /* Gris claro */
+  --sidebar-hover-bg: #34495e; /* Azul grisáceo */
+  --sidebar-closed-width: 70px; /* Ancho del sidebar cerrado */
+  --sidebar-open-width: 250px; /* Ancho del sidebar abierto */
+  --transition-duration: 0.3s;
+  --menu-hover-bg: #4b6277; /* Azul grisáceo para hover */
+  --logout-btn-bg: #d35400; /* Naranja oscuro para el botón logout */
+  --logout-btn-color: #fff; /* Color blanco para el texto */
+  --logout-btn-hover-bg: #e67e22; /* Naranja brillante para hover */
+  --content-bg: #f4f6f9; /* Fondo claro para el contenido */
 }
 
-nav {
+/* Estilos generales del sidebar */
+.sidebar {
   position: fixed;
-  width: 100%;
-  max-width: 300px;
-  bottom: 0;
   top: 0;
-  display: block;
-  min-height: 300px;
-  height: 100%;
-  color: #ffffff;
-  background: #2a2a2a;
-  opacity: 0.95;
-  transition: all 300ms ease;
+  left: 0;
+  height: 100vh;
+  width: var(--sidebar-open-width);
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-color);
+  display: flex;
+  flex-direction: column;
+  transition: width var(--transition-duration);
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
-nav .vertical-menu hr {
-  opacity: 0.1;
-  border-width: 0.5px;
-  border-color: #555;
+/* Sidebar cerrado */
+.sidebar.is-closed {
+  width: var(--sidebar-closed-width);
+  /* Asegura que los iconos se muestren en una columna cuando esté cerrado */
+  flex-direction: column;
+  align-items: center; /* Alineación centrada para los iconos */
 }
 
-nav ul {
-  width: 90%;
-  padding-inline-start: 0;
-  margin: 10px;
-  height: calc(100% - 20px);
+/* Sidebar Header */
+.sidebar-header {
+  padding: 15px;
+  display: flex;
+  justify-content: flex-end;
 }
 
-nav .vertical-menu-logo {
-  padding: 20px;
-  font-size: 1.3em;
-  font-weight: bold;
-  color: #ffffff;
-  position: relative;
-}
-
-nav .vertical-menu-logo .open-menu-btn {
-  width: 30px;
-  height: max-content;
-  position: absolute;
-  display: block;
-  right: 20px;
-  top: 0;
-  bottom: 0;
-  margin: auto;
+/* Botón Toggler usando FontAwesome */
+.menu-toggle-btn {
+  background: transparent;
+  border: none;
   cursor: pointer;
+  font-size: 24px; /* Tamaño del ícono */
+  color: var(--sidebar-color);
 }
 
-nav .vertical-menu-logo .open-menu-btn hr {
-  margin: 5px 0;
-  background-color: #ffffff;
-}
-
-nav li {
+/* Estilos de la lista de elementos del menú */
+.sidebar-menu {
   list-style: none;
-  padding: 12px;
-  cursor: pointer;
-  color: #bbb;
-  transition: background 200ms, color 200ms;
+  padding: 0;
+  margin-top: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
 }
 
-nav li:hover {
-  color: #4b69b3;
-  background-color: #383838;
-}
-
-nav li#user-info {
-  position: absolute;
-  bottom: 0;
-  width: 80%;
-}
-
-nav li#user-info > span {
-  display: block;
-  float: right;
-  font-size: 0.9em;
-  position: relative;
-  opacity: 0.6;
-}
-
-nav li#user-info > span:after {
-  content: '';
-  width: 12px;
-  height: 12px;
-  display: block;
-  position: absolute;
-  background: #4caf50;
-  left: -20px;
-  top: 0;
-  bottom: 0;
-  margin: auto;
-  border-radius: 50%;
-}
-
-.content-wrapper {
-  width: calc(100% - 300px);
-  height: 100%;
-  position: fixed;
-  background: #ffffff;
-  left: 300px;
-  padding: 20px;
-  transition: all 300ms ease;
-}
-
-.closed-menu .content-wrapper {
+/* Los elementos del menú */
+.menu-item {
+  padding: 12px 16px;
+  transition: background 0.2s;
   width: 100%;
-  left: 50px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
 
-.vertical-menu-wrapper .vertical-menu-logo div {
-  transition: all 100ms ease;
+.menu-item:hover {
+  background-color: var(--menu-hover-bg);
 }
 
-.closed-menu .vertical-menu-wrapper .vertical-menu-logo div {
-  margin-left: -100px;
+/* Enlace del menú */
+.menu-link {
+  display: flex;
+  align-items: center;
+  color: var(--sidebar-color);
+  text-decoration: none;
+  width: 100%;
 }
 
-.vertical-menu-wrapper .vertical-menu-logo .open-menu-btn {
-  transition: all 300ms ease;
+/* Icono del menú */
+.menu-icon {
+  margin-right: 10px;
+  font-size: 20px;
+  transition: margin-right 0.2s ease;
 }
 
-.closed-menu .vertical-menu-wrapper .vertical-menu-logo .open-menu-btn {
-  left: 7px;
-  right: 100%;
+/* Si el sidebar está cerrado, quitar el margen de los iconos */
+.sidebar.is-closed .menu-icon {
+  margin-right: 0;
 }
 
-.closed-menu .vertical-menu-wrapper ul,
-.closed-menu .vertical-menu-wrapper hr {
-  margin-left: -300px;
+/* Texto del menú solo visible cuando el sidebar está abierto */
+.menu-text {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.vertical-menu-wrapper ul,
-.vertical-menu-wrapper hr {
-  transition: all 100ms ease;
+/* Logout Button */
+.logout {
+  padding: 10px 16px;
 }
 
-.content-wrapper {
-  background: #ebebeb;
+.logout-btn {
+  background-color: var(--logout-btn-bg);
+  border: none;
+  color: var(--logout-btn-color);
+  padding: 8px 16px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  border-radius: 4px;
+  transition: background 0.3s, color 0.3s;
 }
 
-.content {
-  width: 90%;
-  min-height: 90%;
-  background: #fff;
-  border-radius: 10px;
-  padding: 30px;
+.logout-btn:hover {
+  background-color: var(--logout-btn-hover-bg);
+  color: #fff;
 }
 </style>
