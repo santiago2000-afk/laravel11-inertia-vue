@@ -1,21 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
-
-// Importar los componentes que deseas cargar según la ruta
 import Home from './Pages/Home.vue';
-import Contact from './Pages/Contact.vue';
 
 const routes = [
-  {
-    path: '/home',
-    component: Home,
-    name: 'home',
-  },
-  {
-    path: '/contact',
-    component: Contact,
-    name: 'contact',
-  },
-  // Puedes añadir más rutas aquí
+  { path: '/dashboard', name: 'home', component: Home },
 ];
 
 const router = createRouter({

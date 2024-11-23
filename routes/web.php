@@ -7,7 +7,7 @@ Route::get('/', function () {
     return Inertia::render('Welcome');
 });
 
-Route::get('/home', function () {
+Route::get('/dashboard', function () {
     return Inertia::render('Home');
 });
 
