@@ -229,6 +229,16 @@ export default {
   padding: 20px;
 }
 
+.menu-toggle-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .menu-toggle-btn {
+    display: inline-block;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .sidebar.is-mobile {
